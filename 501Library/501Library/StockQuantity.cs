@@ -38,6 +38,7 @@ namespace StockLibrary
                 return priceAtPurchase;
             }
         }
+
         /// <summary>
         /// Gets the stock
         /// </summary>

@@ -47,7 +47,7 @@ namespace StockLibrary
         /// <summary>
         /// The flat rate fee charged for transferring money
         /// </summary>
-        private const double TRANSFEE = 4.99f;
+        private const double TRANSFEE = 4.99;
 
         /// <summary>
         /// Returns the fee for performing a transfer of money (deposit/withdrawl)
@@ -268,7 +268,7 @@ namespace StockLibrary
         public bool Sell(string portName, string stockName, int amount)
         {
             Portfolio selectedPortfolio = null;
-            StockQuantity selectedStock = null;
+            Stock selectedStock = null;
             foreach (Portfolio p in portfolios)
             {
                 if (p.Name == portName)
@@ -281,11 +281,11 @@ namespace StockLibrary
                 Console.WriteLine("Error, portfolio not found");
                 return false;
             }
-            foreach(StockQuantity s in selectedPortfolio.Stocks)
+            foreach(KeyValuePair<Stock, int> s in selectedPortfolio.Stocks)
             {
-                if (s.Stock.Name == stockName)
+                if (s.Key.Name == stockName)
                 {
-                    selectedStock = s;
+                    selectedStock = s.Key;
                 }
             }
             if (selectedStock == null)
@@ -293,8 +293,9 @@ namespace StockLibrary
                 Console.WriteLine("Error, stock not found");
                 return false;
             }
-            cashBalance += selectedPortfolio.sell(selectedStock.Stock.Ticker, amount);
-            transactionHistory.Add(new Transaction("SELL", amount, period, selectedStock.Stock, selectedStock.Stock.StockPrice));
+            double gainOnSale = selectedPortfolio.sell(selectedStock, amount);
+            cashBalance += gainOnSale;
+            transactionHistory.Add(new Transaction(Transaction.Event.SOLD_STOCK, selectedPortfolio, selectedStock, selectedStock.StockPrice, amount, gainOnSale));
             return true;
         }
 
@@ -342,7 +343,7 @@ namespace StockLibrary
             cashBalance -= selectedStock.StockPrice * amount + TRADEFEE;
             selectedPortfolio.Add(selectedStock, amount);
             depositedCash -= TRADEFEE;
-            transactionHistory.Add(new Transaction("BUY", amount, period, selectedStock, selectedStock.StockPrice));
+            transactionHistory.Add(new Transaction(Transaction.Event.PURCHASED_STOCK, selectedPortfolio, selectedStock, selectedStock.StockPrice, amount));
             return 0;
         }
 
@@ -382,17 +383,6 @@ namespace StockLibrary
             }
         }
 
-        /// <summary>
-        /// Advances the portfolio to the next period
-        /// </summary>
-        public void NextPeriod()
-        {
-            period += 1;
-            foreach (Portfolio p in Portfolios)
-            {
-                p.NextPeriod();
-            }
-        }
 
         /// <summary>
         /// Finds a portfolio with the given string name

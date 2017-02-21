@@ -8,15 +8,21 @@ namespace StockLibrary
 {
     public class Portfolio
     {
+
+        /// <summary>
+        /// A List of all transactions to occur on the account
+        /// </summary>
+        List<Transaction> _transactions = new List<Transaction>();
+
         /// <summary>
         /// Stocks contained in this portfolio
         /// </summary>
-        private List<StockQuantity> stocks;
+        private Dictionary<Stock, int> stocks;
 
         /// <summary>
         /// Gets the list of stocks contained in this portfolio
         /// </summary>
-        public List<StockQuantity> Stocks
+        public Dictionary<Stock, int> Stocks
         {
             get
             {
@@ -83,9 +89,9 @@ namespace StockLibrary
             get
             {
                double returnvalue = 0;
-               foreach (StockQuantity sq in stocks)
+               foreach (KeyValuePair<Stock, int> k in stocks)
                 {
-                    returnvalue += (sq.Stock.StockPrice * sq.Quantity);
+                    returnvalue += (k.Key.StockPrice * k.Value);
                 }
                 return (double)Math.Round(returnvalue, 2);
             }
@@ -198,52 +204,30 @@ namespace StockLibrary
             this.name = name;
             periodStartValue = 0;
             originPrices = 0;
-            stocks = new List<StockQuantity>();
+            stocks = new Dictionary<Stock, int>();
         }
 
-        /// <summary>
-        /// Called when moving to the next period. Changes the start value of the portfolio to the current value
-        /// </summary>
-        public void NextPeriod()
-        {
-            periodStartValue = PositionsBalance;
-            foreach (StockQuantity s in stocks)
-            {
-                s.PeriodStartPrice = s.Stock.StockPrice;
-            }
-        }
-
+       
         /// <summary>
         /// Adds a stock to the list of stocks contained
         /// </summary>
         /// <param name="stock">The stock to add</param>
         /// <param name="quantity">The number of stocks to buy</param>
         /// <returns>The value of the purchase</returns>
-        public double Add(Stock stock, int quantity)
+        public void Add(Stock desiredStock, int numberToBuy)
         {
-            bool exists = false;
-            StockQuantity sq = null;
-            foreach (StockQuantity s in stocks)
+            if (stocks.ContainsKey(desiredStock))
             {
-                if (s.Stock.Name == stock.Name)
-                {
-                    exists = true;
-                    sq = s;
-                    break;
-                }
+                int newTotalStocks = stocks[desiredStock] + numberToBuy;
+                stocks.Remove(desiredStock);
+                stocks.Add(desiredStock, newTotalStocks);
+
             }
-            if (!exists)//if the stock does not exist, add a new one to the list
+            else
             {
-                stocks.Add(new StockQuantity(stock, quantity));
-                originPrices += stock.StockPrice * quantity;
+                stocks.Add(desiredStock, numberToBuy);
             }
-            else//If it does exist, just add the quantity
-            {
-                sq.Quantity += quantity;
-                originPrices += sq.PriceAtPurchase * quantity;
-            }
-            
-            return stock.StockPrice * quantity;
+            _transactions.Add(new Transaction(Transaction.Event.SOLD_STOCK, this, desiredStock, desiredStock.StockPrice, numberToBuy));
         }
 
 
@@ -252,77 +236,51 @@ namespace StockLibrary
         /// </summary>
         /// <param name="ticker">String identifier</param>
         /// <returns>The value of the sale in dollars</returns>
-        public double sell(string ticker, int quantity)
+        public double sell(Stock desiredStock, int numberToSell)
         {
-            double returnValue = 0;
-            StockQuantity selectedStock = null;
-            foreach (StockQuantity s in stocks)//Iterates through every stock, searching for the ticker
+            double gain = 0;
+            if (stocks.ContainsKey(desiredStock))
             {
-                if (s.Stock.Ticker == ticker)
+                if (stocks[desiredStock] >= numberToSell)
                 {
-                    selectedStock = s;
-                }
-            }
-            if (selectedStock.Quantity < quantity)//If the quantity to be sold exceeds the owned amount, the user is notified and taken back to the previous screen
-            {
-                Console.WriteLine("You don't own that many stocks!");
-                return returnValue;
-            }
-            else
-            {
-                originPrices -= selectedStock.PriceAtPurchase * quantity;
-                returnValue = selectedStock.Stock.StockPrice * quantity;
-                if (selectedStock.Quantity == quantity)
-                {
-                    stocks.Remove(selectedStock);
-
+                    int newTotalStocks = stocks[desiredStock] - numberToSell;
+                    stocks.Remove(desiredStock);
+                    if (newTotalStocks != 0)
+                    {
+                        stocks.Add(desiredStock, newTotalStocks);
+                    }
+                    int stockLeftToSell = numberToSell;
+                    foreach (Transaction t in _transactions)
+                    {
+                        if (t.Action == Transaction.Event.PURCHASED_STOCK && t.Stock == desiredStock)
+                        {
+                            if (t.SharesPurchased >= stockLeftToSell)
+                            {
+                                gain += (stockLeftToSell * desiredStock.StockPrice) - (stockLeftToSell * t.PriceAtTime);
+                                stockLeftToSell -= t.SharesPurchased;
+                                break;
+                            }
+                            else if (t.SharesPurchased < stockLeftToSell)
+                            {
+                                gain += (t.SharesPurchased * desiredStock.StockPrice) - (t.SharesPurchased * t.PriceAtTime);
+                                stockLeftToSell -= t.SharesPurchased;
+                            }
+                        }
+                    }
+                    if (stockLeftToSell > 0)
+                    {
+                        throw new ArgumentException();
+                    }
+                    _transactions.Add(new Transaction(Transaction.Event.SOLD_STOCK, this, desiredStock, desiredStock.StockPrice, numberToSell, gain));
                 }
                 else
                 {
-                    selectedStock.Quantity -= quantity;
+                    throw new ArgumentException();
                 }
             }
-            return returnValue;
+            return gain;
         }
 
-        /// <summary>
-        /// Removes every stock in the portfolio
-        /// </summary>
-        /// <retruns>The value of every stock in the portfolio in dollars</retruns>
-        public double sellAll()
-        {
-            double returnValue = 0;
-            foreach(StockQuantity s in stocks)
-            {
-                returnValue += s.Stock.StockPrice * s.Quantity;
-                originPrices -= s.PriceAtPurchase * s.Quantity;
-            }
-            stocks = new List<StockQuantity>();
-            return returnValue;
-        }
-
-        /// <summary>
-        /// Generates a portfolio report of all stocks within it and the percent of the portfolio that each accounts for
-        /// </summary>
-        /// <returns>the report</returns>
-        public string Report()
-        {
-            int stockCount = stocks.Count;
-            List<string> details = new List<string>();
-
-            int total = 0;
-            foreach (StockQuantity s in stocks)
-            {
-                details.Add(s.ToString());
-
-                total += s.Quantity;
-            }
-            string output = "";
-            for (int i = 0; i < stocks.Count; i++)
-            {
-                output += ("\nPercent of portfolio: "+ Math.Round(((double)stocks[i].Quantity/total*100), 2) + "% " + details[i]);
-            }
-            return output;
-        }
+       
     }
 }

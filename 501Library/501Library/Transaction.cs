@@ -1,102 +1,219 @@
-﻿using System;
+﻿/* Author: Austin Lee Gray
+ * File Name: Transaction.cs
+ * 
+ * This class implements a Transaction object used to keep track of all actions taken on an account or portfolio
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace StockLibrary
 {
     public class Transaction
     {
+        
         /// <summary>
-        /// Quantity purchased
+        /// The DateTime info for when the action happened
         /// </summary>
-        private int quantity;
+        private DateTime _dateTime;
 
         /// <summary>
-        /// either "buy" or "sell" depending on whether this is a buy or sell transaction
+        /// The Event Enum. Gives details of what the action taken was
         /// </summary>
-        private string buySell;
+        private Event _event;
 
         /// <summary>
-        /// The period when purchased
+        /// The amount of money involved in the action
         /// </summary>
-        private int period;
+        private double _amount;
 
         /// <summary>
-        /// The stock purchased
+        /// The name of a given portfolio
         /// </summary>
-        private Stock stock;
+        private string _name;
 
         /// <summary>
-        /// The price at purchase
+        /// the gain/loss of the transaction
         /// </summary>
-        private double price;
+        private double _gain;
 
         /// <summary>
-        /// Getter for quantity
+        /// The literal portfolio used in the transaction
         /// </summary>
-        public int Quantity
-        {
-            get
-            {
-                return quantity;
-            }
-        }
+        private Portfolio _portfolio;
 
         /// <summary>
-        /// Getter for period
+        /// The Stock involved in the transaction
         /// </summary>
-        public int Period
-        {
-            get
-            {
-                return period;
-            }
-        }
+        private Stock _stock;
 
         /// <summary>
-        /// Getter for stock
+        /// The price of the stock at the time of the transaction
+        /// </summary>
+        private double _priceAtTime;
+
+        /// <summary>
+        /// The number of shares purchased during the transaction
+        /// </summary>
+        private int _sharesPurchased;
+
+        /// <summary>
+        /// The number of shares sold during the transaction
+        /// </summary>
+        private int _shareSold;
+
+        /// <summary>
+        /// This Enum gives insight into what type of Event/Action took place during the transaction each of the Enumerations has a set of properties assisated with it
+        /// </summary>
+        public enum Event { ADD_FUNDS_TO_ACCOUNT, WITHDRAW_FUNDS_FROM_ACCOUNT, NEW_PORTFOLIO, DELETE_PORTFOLIO, SOLD_STOCK, PURCHASED_STOCK, ADD_FUNDS_TO_PORTFOLIO, WITHDRAW_FUNDS_FROM_PORTFOLIO }
+
+        /// <summary>
+        /// Returns the stock involved with the transaction
         /// </summary>
         public Stock Stock
         {
             get
             {
-                return stock;
+                return _stock;
             }
         }
 
         /// <summary>
-        /// Getter for price
+        /// Returns the action involved with the transaction
         /// </summary>
-        public double Price
+        public Event Action
         {
             get
             {
-                return price;
+                return _event;
             }
         }
 
         /// <summary>
-        /// Constructor for the Transaction class
+        /// Returns the price at the time of the transaction
         /// </summary>
-        /// <param name="quant">Quantity purchased</param>
-        /// <param name="per">Period purchased</param>
-        /// <param name="stock">Stock purchased</param>
-        /// <param name="price">Price of purchase</param>
-        /// <param name="bs">Whether this is a buy or a sell</param>
-        public Transaction(string bs, int quant, int per, Stock stock, double price)
+        public double PriceAtTime
         {
-            quantity = quant;
-            period = per;
-            this.stock = stock;
-            this.price = price;
-            buySell = bs;
+            get
+            {
+                return _priceAtTime;
+            }
         }
 
+        /// <summary>
+        /// Reruens the number of shares purchased in the transaction
+        /// </summary>
+        public int SharesPurchased
+        {
+            get
+            {
+                return _sharesPurchased;
+            }
+        }
+
+       /*There is multiple constructors for the Transaction class
+        * Each constructor is used for a seperate Event with the exception of
+        * the adding and transfering funds events.
+        * This allows a single class to represent all the information needed.
+        */
+
+
+
+        public Transaction(Event action, double amount)
+        {
+            _event = action;
+            _dateTime = DateTime.UtcNow;
+            _amount = amount;
+        }
+
+        public Transaction(Event action, string name)
+        {
+            _event = action;
+            _dateTime = DateTime.UtcNow;
+            _name = name;
+        }
+
+        public Transaction(Event action, string name, double gain)
+        {
+            _event = action;
+            _dateTime = DateTime.UtcNow;
+            _name = name;
+            _gain = gain;
+        }
+
+        public Transaction(Event action, Portfolio portfolio, Stock stock, double priceAtTime, int sharesPurchased)
+        {
+            _event = action;
+            _dateTime = DateTime.UtcNow;
+            _portfolio = portfolio;
+            _stock = stock;
+            _priceAtTime = priceAtTime;
+            _sharesPurchased = sharesPurchased;
+        }
+
+        public Transaction(Event action, Portfolio portfolio, Stock stock, double priceAtTime, int shareSold, double gain)
+        {
+            _event = action;
+            _dateTime = DateTime.UtcNow;
+            _portfolio = portfolio;
+            _stock = stock;
+            _priceAtTime = priceAtTime;
+            _shareSold = shareSold;
+            _gain = gain;
+        }
+
+        public Transaction(Event action, Portfolio portfolio, double amount)
+        {
+            _event = action;
+            _dateTime = DateTime.UtcNow;
+            _amount = amount;
+        }
+
+        
+
+        /// <summary>
+        /// This ToString overrides the default.
+        /// This method returns a string based on what type of Event is assosiated with the instance of the class
+        /// And is mostly used only for log displaying 
+        /// </summary>
+        /// <returns>String based on the Event</returns>
         public override string ToString()
         {
-            return (buySell.ToUpper() +", Period: " + period + "; " + stock.Ticker + " - " + stock.Name + ", Quantity: " + quantity + " at $" + price);
+            switch (_event)
+            {
+                case Event.ADD_FUNDS_TO_ACCOUNT:
+                    return "Added " + _amount.ToString("C", CultureInfo.CurrentCulture) + " to account at " + _dateTime.ToLocalTime();
+
+                case Event.ADD_FUNDS_TO_PORTFOLIO:
+                    return "Added " + _amount.ToString("C", CultureInfo.CurrentCulture) + " to portfolio " + _portfolio + "at time " + _dateTime.ToLocalTime();
+                    
+
+                case Event.DELETE_PORTFOLIO:
+                    return "Deleted portfolio " + _name + " at " + _dateTime.ToLocalTime() + "it had a net gain of " + _gain.ToString("C", CultureInfo.CurrentCulture);
+
+                case Event.NEW_PORTFOLIO:
+                    return "Created portfolio " + _name + " at " + _dateTime.ToLocalTime();
+
+                case Event.PURCHASED_STOCK:
+                    return "Bought " + _sharesPurchased + " shares of " + _stock.Name + "at a price of " + _priceAtTime.ToString("C", CultureInfo.CurrentCulture) + " for each share at " + _dateTime.ToLocalTime();
+
+                case Event.SOLD_STOCK:
+                    return "Sold " + _sharesPurchased + " shares of " + _stock.Name + "at a price of " + _priceAtTime.ToString("C", CultureInfo.CurrentCulture) + " for each share making a gain of " + _gain.ToString("C", CultureInfo.CurrentCulture) + " at " + _dateTime.ToLocalTime();
+                    
+                case Event.WITHDRAW_FUNDS_FROM_ACCOUNT:
+                    return "Withdrew " + _amount.ToString("C", CultureInfo.CurrentCulture) + "from account at " + _dateTime.ToLocalTime();
+
+                case Event.WITHDRAW_FUNDS_FROM_PORTFOLIO:
+                    return "Withdrew " + _amount.ToString("C", CultureInfo.CurrentCulture) + "from portfolio " + _portfolio + "at time " + _dateTime.ToLocalTime();
+
+                default:
+                    throw new ArgumentException();
+            }
         }
+
     }
 }
