@@ -11,7 +11,7 @@ namespace StockLibrary
         /// <summary>
         /// The flat rate fee charged for performing a trade
         /// </summary>
-        private const double TRADEFEE = 9.99f;
+        private const double TRADEFEE = 9.99;
 
         /// <summary>
         /// Keeps track of the period
