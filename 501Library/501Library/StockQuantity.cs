@@ -21,17 +21,17 @@ namespace StockLibrary
         /// <summary>
         /// Price at time of purchase
         /// </summary>
-        private float periodStartPrice;
+        private double periodStartPrice;
 
         /// <summary>
         /// Price of this stock when purchased
         /// </summary>
-        private float priceAtPurchase;
+        private double priceAtPurchase;
 
         /// <summary>
         /// Gets the price at purchase
         /// </summary>
-        public float PriceAtPurchase
+        public double PriceAtPurchase
         {
             get
             {
@@ -67,7 +67,7 @@ namespace StockLibrary
         /// <summary>
         /// Returns or sets the price at the start of the period
         /// </summary>
-        public float PeriodStartPrice
+        public double PeriodStartPrice
         {
             get
             {
@@ -82,7 +82,7 @@ namespace StockLibrary
         /// <summary>
         /// Gets the dollar value of the gain/loss over all
         /// </summary>
-        public float GainLossValue
+        public double GainLossValue
         {
             get
             {
@@ -93,7 +93,7 @@ namespace StockLibrary
         /// <summary>
         /// Gets the gain/loss as a percent
         /// </summary>
-        public float GainLossPercent
+        public double GainLossPercent
         {
             get
             {

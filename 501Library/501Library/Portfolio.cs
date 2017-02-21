@@ -43,12 +43,12 @@ namespace StockLibrary
         /// <summary>
         /// Value at the beginning of the current period
         /// </summary>
-        private float periodStartValue;
+        private double periodStartValue;
 
         /// <summary>
         /// Returns price at the beginning of the current period
         /// </summary>
-        public float PeriodStartValue
+        public double PeriodStartValue
         {
             get
             {
@@ -61,9 +61,9 @@ namespace StockLibrary
         }
 
  /*       /// <summary>
-        /// Gets the cash balance of this portfolio as a float and sets the cash balance
+        /// Gets the cash balance of this portfolio as a double and sets the cash balance
         /// </summary>
-        public float CashBalance
+        public double CashBalance
         {
             get
             {
@@ -76,27 +76,27 @@ namespace StockLibrary
         }*/
 
         /// <summary>
-        /// Gets the positions balance as a float
+        /// Gets the positions balance as a double
         /// </summary>
-        public float PositionsBalance
+        public double PositionsBalance
         {
             get
             {
-               float returnvalue = 0;
+               double returnvalue = 0;
                foreach (StockQuantity sq in stocks)
                 {
                     returnvalue += (sq.Stock.StockPrice * sq.Quantity);
                 }
-                return (float)Math.Round(returnvalue, 2);
+                return (double)Math.Round(returnvalue, 2);
             }
         }
 
         /// <summary>
         /// The value of this portfolio if everything was back to the buying price
         /// </summary>
-        private float originPrices;
+        private double originPrices;
 
-        public float OriginPrices
+        public double OriginPrices
         {
             get
             {
@@ -112,11 +112,11 @@ namespace StockLibrary
         /// <summary>
         /// Returns the value of the portfolio as if the stocks had never changed value
         /// </summary>
-        /*public float OriginalValue
+        /*public double OriginalValue
         {
             get
             {
-                float value = 0;
+                double value = 0;
                 foreach(StockQuantity s in stocks)
                 {
                     value += s.OriginalPrice;
@@ -127,24 +127,24 @@ namespace StockLibrary
         /// <summary>
         /// Returns the value gain/loss of this portfolio (including purchases)
         /// </summary>
-        public float GainLossValue
+        public double GainLossValue
         {
             get
             {
-                /*float returnvalue = 0;
+                /*double returnvalue = 0;
                 foreach (StockQuantity sq in stocks)
                 {
                     returnvalue += (sq.GainLossValue * sq.Quantity);
                 }
                 return returnvalue;*/
-                return (float)Math.Round((PositionsBalance - periodStartValue), 2);
+                return (double)Math.Round((PositionsBalance - periodStartValue), 2);
             }
         }
 
         /// <summary>
         /// Returns the value gain/loss of this portfolio (excluding the value of trades)
         /// </summary>
-        public float NPGainLossValue
+        public double NPGainLossValue
         {
             get
             {
@@ -166,11 +166,11 @@ namespace StockLibrary
         /// <summary>
         /// Finds the gain/loss as a percent for the entire portfolio
         /// </summary>
-        public float GainLossPercent
+        public double GainLossPercent
         {
             get
             {
-                /*float num = 0;
+                /*double num = 0;
                 int totalUnits = 0;
                 foreach (StockQuantity sq in stocks)
                 {
@@ -219,7 +219,7 @@ namespace StockLibrary
         /// <param name="stock">The stock to add</param>
         /// <param name="quantity">The number of stocks to buy</param>
         /// <returns>The value of the purchase</returns>
-        public float Add(Stock stock, int quantity)
+        public double Add(Stock stock, int quantity)
         {
             bool exists = false;
             StockQuantity sq = null;
@@ -252,9 +252,9 @@ namespace StockLibrary
         /// </summary>
         /// <param name="ticker">String identifier</param>
         /// <returns>The value of the sale in dollars</returns>
-        public float sell(string ticker, int quantity)
+        public double sell(string ticker, int quantity)
         {
-            float returnValue = 0;
+            double returnValue = 0;
             StockQuantity selectedStock = null;
             foreach (StockQuantity s in stocks)//Iterates through every stock, searching for the ticker
             {
@@ -289,9 +289,9 @@ namespace StockLibrary
         /// Removes every stock in the portfolio
         /// </summary>
         /// <retruns>The value of every stock in the portfolio in dollars</retruns>
-        public float sellAll()
+        public double sellAll()
         {
-            float returnValue = 0;
+            double returnValue = 0;
             foreach(StockQuantity s in stocks)
             {
                 returnValue += s.Stock.StockPrice * s.Quantity;
@@ -320,7 +320,7 @@ namespace StockLibrary
             string output = "";
             for (int i = 0; i < stocks.Count; i++)
             {
-                output += ("\nPercent of portfolio: "+ Math.Round(((float)stocks[i].Quantity/total*100), 2) + "% " + details[i]);
+                output += ("\nPercent of portfolio: "+ Math.Round(((double)stocks[i].Quantity/total*100), 2) + "% " + details[i]);
             }
             return output;
         }

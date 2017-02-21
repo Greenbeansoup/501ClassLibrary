@@ -31,7 +31,7 @@ namespace StockLibrary
         /// <summary>
         /// The price at purchase
         /// </summary>
-        private float price;
+        private double price;
 
         /// <summary>
         /// Getter for quantity
@@ -69,7 +69,7 @@ namespace StockLibrary
         /// <summary>
         /// Getter for price
         /// </summary>
-        public float Price
+        public double Price
         {
             get
             {
@@ -85,7 +85,7 @@ namespace StockLibrary
         /// <param name="stock">Stock purchased</param>
         /// <param name="price">Price of purchase</param>
         /// <param name="bs">Whether this is a buy or a sell</param>
-        public Transaction(string bs, int quant, int per, Stock stock, float price)
+        public Transaction(string bs, int quant, int per, Stock stock, double price)
         {
             quantity = quant;
             period = per;

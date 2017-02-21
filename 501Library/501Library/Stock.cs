@@ -11,7 +11,7 @@ namespace StockLibrary
         /// <summary>
         /// price of stock in previous period
         /// </summary>
-        private float previousPrice;
+        private double previousPrice;
 
         /// <summary>
         /// The ticker, immutable
@@ -26,7 +26,7 @@ namespace StockLibrary
         /// <summary>
         /// The stockprice
         /// </summary>
-        private float stockPrice;
+        private double stockPrice;
 
         /// <summary>
         /// Displays the ticker
@@ -42,7 +42,7 @@ namespace StockLibrary
         /// <summary>
         /// Gets or sets the previous price (period)
         /// </summary>
-        public float PreviousPrice
+        public double PreviousPrice
         {
             get
             {
@@ -57,7 +57,7 @@ namespace StockLibrary
         /// <summary>
         /// Gets and sets the stockprice for this stock object
         /// </summary>
-        public float StockPrice
+        public double StockPrice
         {
             get
             {
@@ -88,7 +88,7 @@ namespace StockLibrary
         /// <param name="tick">The ticker</param>
         /// <param name="price">The price of the stock</param>
         /// <param name="name">The name of the company associated with the stock</param>
-        public Stock(string tick, float price, string name)
+        public Stock(string tick, double price, string name)
         {
             ticker = tick;
             stockPrice = price;
@@ -100,8 +100,8 @@ namespace StockLibrary
         {
             string gainlosspercent = "";
             string gainlossvalue = "";
-            float gl = (float)Math.Round(gainLossPercent(), 2);
-            float glv = (float)Math.Round(gainLossValue(), 2);
+            double gl = (double)Math.Round(gainLossPercent(), 2);
+            double glv = (double)Math.Round(gainLossValue(), 2);
             if (gl > 0)
             {
                 gainlosspercent = "+" + gl;
@@ -120,12 +120,12 @@ namespace StockLibrary
         /// Returns the period gains as a percent
         /// </summary>
         /// <returns></returns>
-        private float gainLossPercent()
+        private double gainLossPercent()
         {
             return (stockPrice - previousPrice) / previousPrice * 100f;
         }
 
-        private float gainLossValue()
+        private double gainLossValue()
         {
             return (stockPrice - previousPrice);
         }

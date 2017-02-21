@@ -11,7 +11,7 @@ namespace StockLibrary
         /// <summary>
         /// The flat rate fee charged for performing a trade
         /// </summary>
-        private const float TRADEFEE = 9.99f;
+        private const double TRADEFEE = 9.99f;
 
         /// <summary>
         /// Keeps track of the period
@@ -36,7 +36,7 @@ namespace StockLibrary
         /// <summary>
         /// Returns the flat fee charged for performing a trade
         /// </summary>
-        public float TradeFee
+        public double TradeFee
         {
             get
             {
@@ -47,12 +47,12 @@ namespace StockLibrary
         /// <summary>
         /// The flat rate fee charged for transferring money
         /// </summary>
-        private const float TRANSFEE = 4.99f;
+        private const double TRANSFEE = 4.99f;
 
         /// <summary>
         /// Returns the fee for performing a transfer of money (deposit/withdrawl)
         /// </summary>
-        public float TransFee
+        public double TransFee
         {
             get
             {
@@ -63,12 +63,12 @@ namespace StockLibrary
         /// <summary>
         /// The cash balance that is a result of deposits. Will be used to calculate gain/loss of the account
         /// </summary>
-        private float depositedCash;
+        private double depositedCash;
 
         /// <summary>
         /// gets/sets the depositedCash
         /// </summary>
-        public float DepositedCash
+        public double DepositedCash
         {
             get
             {
@@ -126,16 +126,16 @@ namespace StockLibrary
         /// <summary>
         /// Cash in this account
         /// </summary>
-        private float cashBalance;
+        private double cashBalance;
 
         /// <summary>
         /// Gets and sets the cash balance
         /// </summary>
-        public float CashBalance
+        public double CashBalance
         {
             get
             {
-                return (float)Math.Round(cashBalance, 2);
+                return (double)Math.Round(cashBalance, 2);
             }
             set
             {
@@ -146,12 +146,12 @@ namespace StockLibrary
  /*       /// <summary>
         /// Position in dollar amounts of this account
         /// </summary>
-        private float positionsBalance;
+        private double positionsBalance;
 
         /// <summary>
         /// Gets the positionsBalance
         /// </summary>
-        public float PositionsBalance
+        public double PositionsBalance
         {
             get
             {
@@ -213,10 +213,10 @@ namespace StockLibrary
         /// <param name="portfolioName">the name of the portfolio in question</param>
         /// <param name="value">The dollar amount of this portfolio</param>
         /// <returns>The percentage this portfoilio represents</returns>
-        public float PortfolioPercentage(string portfolioName, out float value)
+        public double PortfolioPercentage(string portfolioName, out double value)
         {
             Portfolio p = new Portfolio("0");
-            float totalValue = 0;
+            double totalValue = 0;
             foreach(Portfolio po in portfolios)
             {
                 totalValue += po.PositionsBalance;
@@ -234,15 +234,15 @@ namespace StockLibrary
         /// </summary>
         /// <param name="value">The amount gain/loss in dollars</param>
         /// <returns>The precentage gain/loss</returns>
-        public float GainLoss(out float value)
+        public double GainLoss(out double value)
         {
-            float amount = 0;
+            double amount = 0;
             foreach (Portfolio p in portfolios)
             {
                 amount += p.PositionsBalance;
             }
-            value = (float)Math.Round(amount + cashBalance - depositedCash,2);
-            return (float)Math.Round((value/depositedCash) * 100,2);
+            value = (double)Math.Round(amount + cashBalance - depositedCash,2);
+            return (double)Math.Round((value/depositedCash) * 100,2);
         }
 
         public void DisplayHistory()
@@ -351,7 +351,7 @@ namespace StockLibrary
         /// </summary>
         /// <param name="amount">Amount to be withdrawn</param>
         /// <returns>Boolean that indicates the success of the withdrawl</returns>
-        public bool Withdraw(float amount)
+        public bool Withdraw(double amount)
         {
             if (amount + TRANSFEE <= cashBalance)
             {
@@ -369,7 +369,7 @@ namespace StockLibrary
         /// </summary>
         /// <param name="amount">Amount to be deposited</param>
         /// <returns>Boolean indicating the success of the operation</returns>
-        public bool Deposit(float amount)
+        public bool Deposit(double amount)
         {
             if (amount > TRANSFEE)
             {

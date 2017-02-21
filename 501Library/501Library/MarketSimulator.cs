@@ -33,7 +33,7 @@ namespace StockLibrary
                     num = -num;
                 }
                 s.PreviousPrice = s.StockPrice;
-                s.StockPrice = (float)Math.Round(s.StockPrice * (num / 100.0f + 1.0f), 2);
+                s.StockPrice = (double)Math.Round(s.StockPrice * (num / 100.0f + 1.0f), 2);
             }
         }
     }
